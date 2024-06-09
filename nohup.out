@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "/workspaces/bot1/mrin2.py", line 3, in <module>
+    import telebot
+  File "/home/codespace/.python/current/lib/python3.10/site-packages/telebot/__init__.py", line 40, in <module>
+    from telebot import apihelper, util, types
+  File "/home/codespace/.python/current/lib/python3.10/site-packages/telebot/apihelper.py", line 11, in <module>
+    import requests
+  File "/home/codespace/.local/lib/python3.10/site-packages/requests/__init__.py", line 43, in <module>
+    import urllib3
+  File "/home/codespace/.python/current/lib/python3.10/site-packages/urllib3/__init__.py", line 17, in <module>
+    from .connectionpool import HTTPConnectionPool, HTTPSConnectionPool, connection_from_url
+  File "/home/codespace/.python/current/lib/python3.10/site-packages/urllib3/connectionpool.py", line 15, in <module>
+    from ._request_methods import RequestMethods
+  File "/home/codespace/.python/current/lib/python3.10/site-packages/urllib3/_request_methods.py", line 10, in <module>
+    from .response import BaseHTTPResponse
+  File "/home/codespace/.python/current/lib/python3.10/site-packages/urllib3/response.py", line 44, in <module>
+    from .connection import BaseSSLError, HTTPConnection, HTTPException
+  File "/home/codespace/.python/current/lib/python3.10/site-packages/urllib3/connection.py", line 62, in <module>
+    from .util.ssl_match_hostname import CertificateError, match_hostname
+  File "/home/codespace/.python/current/lib/python3.10/site-packages/urllib3/util/ssl_match_hostname.py", line 9, in <module>
+    import ipaddress
+  File "/home/codespace/.python/current/lib/python3.10/ipaddress.py", line 672, in <module>
+    class _BaseNetwork(_IPAddressBase):
+  File "/home/codespace/.python/current/lib/python3.10/ipaddress.py", line 785, in _BaseNetwork
+    def _address_class(self):
+KeyboardInterrupt
