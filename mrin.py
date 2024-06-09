@@ -295,8 +295,8 @@ def show_access_expiry(message):
         else:
             response = "Your access expiry information is not available."
     else:
-        response = "🚫 Unauthorized Access! 🚫\n\n Oops! it seems like you don't have permission to use the /mylogs command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @MrinMoYxCB for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @MrinMoYxCB now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!"
-        bot.reply_to(message, response)
+        response = "🚫 Unauthorized Access! 🚫\n Oops! It seems like you don't have permission to use the /plan command. To gain access and unleash the power of attacks, you can:\n👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!"
+    bot.reply_to(message, response)
 
 @bot.message_handler(commands=['admincmd'])
 def admin_commands(message):
