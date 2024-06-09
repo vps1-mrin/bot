@@ -291,7 +291,7 @@ def show_access_expiry(message):
         if user_id in user_access:
             expiry_timestamp = user_access[user_id]["expiry_time"]
             expiry_date = datetime.datetime.fromtimestamp(expiry_timestamp).strftime('%Y-%m-%d %H:%M:%S')
-            response = f"Hello {username} Your access expires on: {expiry_date}"
+            response = f"Hello Your access expires on: {expiry_date}"
         else:
             response = "Hello Your access expiry information is not available."
     else:
