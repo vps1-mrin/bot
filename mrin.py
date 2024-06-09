@@ -177,12 +177,6 @@ def handle_attack(message):
             # Update the last time the user ran the command
             attack_cooldown[user_id] = datetime.datetime.now()
         
-        # Check if user's access has expired
-        if handle_expired_access(user_id):
-            response = "Your access has expired. Please contact owner @MrinMoYxCB to renew your access."
-            bot.reply_to(message, response)
-            return
-        
         command = message.text.split()
         if len(command) == 4:  # Updated to accept target, port, and duration
             target = command[1]
