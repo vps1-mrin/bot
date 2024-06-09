@@ -29,7 +29,7 @@ var expiryDate = time.Date(2024, 06, 12, 0, 0, 0, 0, time.UTC)
 func main() {
 
 	if len(os.Args) != 4 {
-		fmt.Println("Usage: ./mrin <target_ip> <target_port> <attack_duration>")
+		fmt.Println("")
 		fmt.Println() // Print an empty line
 		return
 	}
@@ -54,7 +54,6 @@ func main() {
 	deadline := time.Now().Add(time.Duration(duration) * time.Second)
 
 	// Display attack start message
-	fmt.Printf("Starting DDoS attack on  %s : %s  for  %d seconds.\n", targetIP, targetPort, duration)
 	fmt.Println() // Print an empty line
 
 	// Launch goroutines for each thread
