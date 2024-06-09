@@ -226,7 +226,7 @@ def handle_bgmi(message):
         else:
             response = "Usage: /attack <ip> <port> <time>" # Updated command syntax
     else: 
-        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! {username}  seems like you don't have permission to use the /attack command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")
+        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! it  seems like you don't have permission to use the /attack command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")
 
     bot.reply_to(message, response)
 
@@ -246,7 +246,7 @@ def show_command_logs(message):
         except FileNotFoundError:
             response = "No command logs found."
     else:
-        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! {username} seems like you don't have permission to use the /mylogs command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")
+        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! it seems like you don't have permission to use the /mylogs command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")
     bot.reply_to(message, response)
 
 @bot.message_handler(commands=['help'])
@@ -281,9 +281,9 @@ def show_access_expiry(message):
             expiry_date = datetime.datetime.fromtimestamp(expiry_timestamp).strftime('%Y-%m-%d %H:%M:%S')
             response = f"Hello {username} Your access expires on: {expiry_date}"
         else:
-            response = "Hello {username} Your access expiry information is not available."
+            response = "Hello Your access expiry information is not available."
     else:
-        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! {username} seems like you don't have permission to use the /plan command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")    
+        response = ("🚫 Unauthorized Access! 🚫\n\n Oops! It seems like you don't have permission to use the /plan command. To gain access and unleash the power of attacks,\n\n you can:👉 Contact an Admin or the Owner @OFFICIALRINO for approval.\n🌟 Become a proud supporter and purchase approval.\n💬 Chat with an Owner @OFFICIALRINO now and level up your capabilities!\n\n🚀 Ready to supercharge your experience? Take action and get ready for powerful attacks!")    
         bot.reply_to(message, response)
 
 @bot.message_handler(commands=['admincmd'])
